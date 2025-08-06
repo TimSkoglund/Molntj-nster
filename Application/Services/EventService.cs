@@ -1,10 +1,6 @@
 ﻿using Application.Models;
-using Azure.Core;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Persistence.Entities;
 using Persistence.Repositories;
-using System.Security.Cryptography.X509Certificates;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Application.Services;
 public class EventService(IEventRepository eventRepository) : IEventService
@@ -43,10 +39,6 @@ public class EventService(IEventRepository eventRepository) : IEventService
     public async Task<EventResult<IEnumerable<Event>>> GetEventAsync()
     {
         var result = await _eventRepository.GetAllAsync();
-        if (result.Success  && result.Result != null)
-        {
-            var currentEvent
-        }
         var events = result.Result?.Select(x => new Event
         {
             Image = x.Image,
@@ -57,6 +49,25 @@ public class EventService(IEventRepository eventRepository) : IEventService
         });
 
         return new EventResult<IEnumerable<Event>> { Success = true, Result = events };
+    }
+
+    public async Task<EventResult<Event?>> GetEventAsync(string eventId)
+    {
+        var result = await _eventRepository.GetAsync(x => x.Id == eventId);
+        if (result.Success && result.Result != null)
+        {
+            var currentEvent = new Event
+            {
+                Id = result.Result.Id,
+                Image = result.Result.Image,
+                Title = result.Result.Title,
+                Description = result.Result.Description,
+                Location = result.Result.Location,
+                EventDate = result.Result.EventDate
+            };
+            return new EventResult<Event?> { Success = true, Result = currentEvent };
+        }
+        return new EventResult<Event?> { Success = false, Error = "Event not found" };
     }
 
 }

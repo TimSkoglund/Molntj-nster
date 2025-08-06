@@ -5,5 +5,7 @@ namespace Application.Services;
 public interface IEventService
 {
     Task<EventResult> CreateEventAsync(CreateEventRequest request);
+    Task<EventResult<IEnumerable<Event>>> GetEventAsync();
+    Task<EventResult<Event?>> GetEventAsync(string eventId);
 }
 
